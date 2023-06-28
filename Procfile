@@ -1,1 +1,1 @@
-web: gunicorn django_exercise.wsgi --log-file -
+web: gunicorn github-union-badge.wsgi --log-file -
