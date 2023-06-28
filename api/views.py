@@ -6,6 +6,7 @@ from json import JSONDecodeError
 
 from django.http import HttpResponse
 from .images import UNKNOWN, UNRATED, BRONZE, SILVER, GOLD, PLATINUM, DIAMOND, RUBY, MASTER
+from .images import KOREA
 
 locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 
@@ -72,14 +73,10 @@ TIER_RATES = (
 
 class UrlSettings(object):
     def __init__(self, request, MAX_LEN):
-        self.api_server = 'https://solved.ac/api'
-        self.boj_handle = request.GET.get("boj", "ccoco")
-        if len(self.boj_handle) > MAX_LEN:
-            self.boj_name = self.boj_handle[:(MAX_LEN - 2)] + "..."
-        else:
-            self.boj_name = self.boj_handle
-        self.user_information_url = self.api_server + \
-            '/v3/user/show?handle=' + self.boj_handle
+        self.school = request.GET.get("school", "school")
+        self.name = request.GET.get("name", "name")
+        self.desc = request.GET.get("desc", "desc")
+        self.info_url = request.GET.get("info_url", "info_url")
 
 
 class BojDefaultSettings(object):
@@ -144,51 +141,226 @@ class BojDefaultSettings(object):
         if rating < 3000: return (rating-2800) // 50 + 27
         return 31
 
-
 def generate_badge(request):
     MAX_LEN = 11
     url_set = UrlSettings(request, MAX_LEN)
-    handle_set = BojDefaultSettings(request, url_set)
+    # handle_set = BojDefaultSettings(request, url_set)
     svg = '''
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" 
-  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="6cm" height="5cm" viewBox="0 0 600 500"
-     xmlns="http://www.w3.org/2000/svg" version="1.1">
-  <desc>Example script01 - invoke an ECMAScript function from an onclick event
-  </desc>
-  <!-- ECMAScript to change the radius with each click -->
-  <script type="application/ecmascript"> <![CDATA[
-    function circle_click(evt) {
-      var circle = evt.target;
-      var currentRadius = circle.getAttribute("r");
-      if (currentRadius == 100)
-        circle.setAttribute("r", currentRadius*2);
-      else
-        circle.setAttribute("r", currentRadius*0.5);
-    }
-  ]]> </script>
-
-  <!-- Outline the drawing area with a blue line -->
-  <rect x="1" y="1" width="598" height="498" fill="none" stroke="blue"/>
-
-  <!-- Act on each click event -->
-  <circle onclick="circle_click(evt)" cx="300" cy="225" r="100"
-          fill="red"/>
-
-  <text x="300" y="480" 
-        font-family="Verdana" font-size="35" text-anchor="middle">
-
-    Click on circle to change its size
-  </text>
+    <!DOCTYPE svg PUBLIC
+        "-//W3C//DTD SVG 1.1//EN"
+        "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg height="1024" width="682"
+    version="1.1"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xml:space="preserve">
+    <style type="text/css">
+        <![CDATA[
+            @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;800;900&display=block');
+            .background {{
+                fill: url(#grad);
+                stroke:{border_color};
+                stroke-width:8px;
+            }}
+            text {{
+                font-family: 'Noto Sans KR', sans-serif;
+            }}
+            .union_name {{
+                font-weight: 700;
+                font-size: 90px;
+                fill: {title_color};
+            }}
+            .name {{
+                font-weight: 900;
+                font-size: 69px;
+                fill: {desc_color};
+            }}
+            .desc {{
+                font-weight: 600;
+                font-size: 40px;
+                fill: {desc_color};
+            }}
+            .info_url {{
+                font-weight: 700;
+                font-size: 90px;
+                fill: {desc_color};
+            }}
+        ]]>
+    </style>
+    <defs>
+        <linearGradient id="grad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:{primary_bg};stop-opacity:1"></stop>
+            <stop offset="20%" style="stop-color:{primary_bg};stop-opacity:1"></stop>
+            <stop offset="100%" style="stop-color:{secondary_bg};stop-opacity:1"></stop>
+        </linearGradient>
+    </defs>
+    <rect x="4px" y="4px" width="674" height="1016" rx="30" ry="30" class="background"/>
+    <text x="50%" y="10%" dominant-baseline="middle" text-anchor="middle" class="union_name">{school}</text>
+    <image href="{union_img_link}" x="50%" y="40%" height="320px" width="320px" transform="translate(-160,-160)" class="tier-title"/>
+    <text x="50%" y="65%" dominant-baseline="middle" text-anchor="middle" class="name">{name}</text>
+    <text x="50%" y="70%" dominant-baseline="middle" text-anchor="middle" class="desc">{desc}</text>
+    <text x="50%" y="10%" dominant-baseline="middle" text-anchor="middle" class="info_url">{info_url}</text>
 </svg>
-    '''
+    '''.format(
+        primary_bg='#73001C',
+        secondary_bg='#FFFFFF',
+        school=url_set.school,
+        union_img_link=KOREA,
+        name=url_set.name,
+        desc=url_set.desc,
+        info_url=url_set.info_url,
+        title_color='#FFFFFF',
+        desc_color='#73001C',
+        border_color='#FFFFFF'
+        )
 
-    logger.info('[/generate_badge] user: {}, tier: {}'.format(url_set.boj_name, handle_set.tier_title))
+    # logger.info('[/generate_badge] user: {}, tier: {}'.format(url_set.boj_name, handle_set.tier_title))
     response = HttpResponse(content=svg)
     response['Content-Type'] = 'image/svg+xml'
     response['Cache-Control'] = 'max-age=3600'
 
     return response
+
+# def generate_badge(request):
+#     MAX_LEN = 11
+#     url_set = UrlSettings(request, MAX_LEN)
+#     handle_set = BojDefaultSettings(request, url_set)
+#     svg = '''
+#     <!DOCTYPE svg PUBLIC
+#         "-//W3C//DTD SVG 1.1//EN"
+#         "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+# <svg height="170" width="350"
+#     version="1.1"
+#     xmlns="http://www.w3.org/2000/svg"
+#     xmlns:xlink="http://www.w3.org/1999/xlink"
+#     xml:space="preserve">
+#     <style type="text/css">
+#         <![CDATA[
+#             @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=block');
+#             @keyframes delayFadeIn {{
+#                 0%{{
+#                     opacity:0
+#                 }}
+#                 60%{{
+#                     opacity:0
+#                 }}
+#                 100%{{
+#                     opacity:1
+#                 }}
+#             }}
+#             @keyframes fadeIn {{
+#                 from {{
+#                     opacity: 0;
+#                 }}
+#                 to {{
+#                     opacity: 1;
+#                 }}
+#             }}
+#             @keyframes rateBarAnimation {{
+#                 0% {{
+#                     stroke-dashoffset: {bar_size};
+#                 }}
+#                 70% {{
+#                     stroke-dashoffset: {bar_size};
+#                 }}
+#                 100%{{
+#                     stroke-dashoffset: 35;
+#                 }}
+#             }}
+#             .background {{
+#                 fill: url(#grad);
+#             }}
+#             text {{
+#                 fill: white;
+#                 font-family: 'Noto Sans KR', sans-serif;
+#             }}
+#             text.boj-handle {{
+#                 font-weight: 700;
+#                 font-size: 1.45em;
+#                 animation: fadeIn 0.8s ease-in-out forwards;
+#             }}
+#             text.tier-text {{
+#                 font-weight: 700;
+#                 font-size: 1.45em;
+#                 opacity: 55%;
+#             }}
+#             text.tier-number {{
+#                 font-size: 3.1em;
+#                 font-weight: 700;
+#             }}
+#             .subtitle {{
+#                 font-weight: 500;
+#                 font-size: 0.9em;
+#             }}
+#             .value {{
+#                 font-weight: 400;
+#                 font-size: 0.9em;
+#             }}
+#             .percentage {{
+#                 font-weight: 300;
+#                 font-size: 0.8em;
+#             }}
+#             .progress {{
+#                 font-size: 0.7em;
+#             }}
+#             .item {{
+#                 opacity: 0;
+#                 animation: delayFadeIn 1s ease-in-out forwards;
+#             }}
+#             .rate-bar {{
+#                 stroke-dasharray: {bar_size};
+#                 stroke-dashoffset: {bar_size};
+#                 animation: rateBarAnimation 1.5s forwards ease-in-out;
+#             }}
+#         ]]>
+#     </style>
+#     <defs>
+#         <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="35%">
+#             <stop offset="10%" style="stop-color:{color1};stop-opacity:1"></stop>
+#             <stop offset="55%" style="stop-color:{color2};stop-opacity:1"></stop>
+#             <stop offset="100%" style="stop-color:{color3};stop-opacity:1"></stop>
+#         </linearGradient>
+#     </defs>
+#     <rect width="350" height="170" rx="10" ry="10" class="background"/>
+#     <text x="315" y="50" class="tier-text" text-anchor="end" >{tier_title}{tier_rank}</text>
+#     <text x="35" y="50" class="boj-handle">{boj_handle}</text>
+#     <g class="item" style="animation-delay: 200ms">
+#         <text x="35" y="79" class="subtitle">rate</text><text x="145" y="79" class="rate value">{rate}</text>
+#     </g>
+#     <g class="item" style="animation-delay: 400ms">
+#         <text x="35" y="99" class="subtitle">solved</text><text x="145" y="99" class="solved value">{solved}</text>
+#     </g>
+#     <g class="item" style="animation-delay: 600ms">
+#         <text x="35" y="119" class="subtitle">class</text><text x="145" y="119" class="class value">{boj_class}{boj_class_decoration}</text>
+#     </g>
+#     <g class="rate-bar" style="animation-delay: 800ms">
+#         <line x1="35" y1="142" x2="{bar_size}" y2="142" stroke-width="4" stroke="floralwhite" stroke-linecap="round"/>
+#     </g>
+#     <line x1="35" y1="142" x2="290" y2="142" stroke-width="4" stroke-opacity="40%" stroke="floralwhite" stroke-linecap="round"/>
+#     <text x="297" y="142" alignment-baseline="middle" class="percentage">{percentage}%</text>
+#     <text x="293" y="157" class="progress" text-anchor="end">{now_rate} / {needed_rate}</text>
+# </svg>
+#     '''.format(color1=BACKGROUND_COLOR[handle_set.tier_title][0],
+#                color2=BACKGROUND_COLOR[handle_set.tier_title][1],
+#                color3=BACKGROUND_COLOR[handle_set.tier_title][2],
+#                boj_handle=url_set.boj_name,
+#                tier_rank=handle_set.tier_rank,
+#                tier_title=handle_set.tier_title,
+#                solved=handle_set.solved,
+#                boj_class=handle_set.boj_class,
+#                boj_class_decoration=handle_set.boj_class_decoration,
+#                rate=handle_set.rate,
+#                now_rate=handle_set.now_rate,
+#                needed_rate=handle_set.needed_rate,
+#                percentage=handle_set.percentage,
+#                bar_size=handle_set.bar_size)
+
+#     logger.info('[/generate_badge] user: {}, tier: {}'.format(url_set.boj_name, handle_set.tier_title))
+#     response = HttpResponse(content=svg)
+#     response['Content-Type'] = 'image/svg+xml'
+#     response['Cache-Control'] = 'max-age=3600'
+
+#     return response
 
 
 def generate_badge_v2(request):
