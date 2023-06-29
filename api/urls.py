@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import generate_badge
+from .views import union_badge
 
 urlpatterns = [
-    path('generate_badge', generate_badge)
+    path('union_badge', union_badge)
 ]
