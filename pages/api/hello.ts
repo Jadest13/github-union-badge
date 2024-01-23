@@ -41,7 +41,7 @@ export default function handler(
         text: urlinfo,
         color: nowTheme.desc_color,
       },
-      borderColor: nowTheme.border_color,
+      border_color: nowTheme.border_color,
       logo: nowTheme.logo,
       pri_bg: nowTheme.primary_bg,
       sec_bg: nowTheme.secondary_bg,
