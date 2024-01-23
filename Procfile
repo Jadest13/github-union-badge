@@ -1,1 +1,0 @@
-web: gunicorn github-union-badge.wsgi --log-file -

@@ -1,5 +1,5 @@
-Themes = {
-  'KOREA': {
+export const themes = {
+  korea: {
     'title': 'KOREA',
     'logo': 'KOREA.png',
     'primary_bg': '#73001C',
@@ -8,7 +8,7 @@ Themes = {
     'desc_color': '#73001C',
     'border_color': '#FFFFFF'
   },
-  'SOONGSIL': {
+  soongsil: {
     'title': 'SOONGSIL',
     'logo': 'SOONGSIL.png',
     'primary_bg': '#00B3FF',
@@ -17,7 +17,7 @@ Themes = {
     'desc_color': '#00B3FF',
     'border_color': '#FFFFFF'
   },
-  'HANYANG': {
+  hanyang: {
     'title': 'HANYANG',
     'logo': 'HANYANG.png',
     'primary_bg': '#006BCD',
@@ -26,7 +26,7 @@ Themes = {
     'desc_color': '#006BCD',
     'border_color': '#FFFFFF'
   },
-  'SUNGKYUNKWAN': {
+  sungkyunkwan: {
     'title': 'SUNGKYUN',
     'logo': 'SUNGKYUNKWAN.png',
     'primary_bg': '#003B71',
