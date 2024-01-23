@@ -84,7 +84,7 @@ class Card {
     this.title_color = title_color;
     this.desc_color = desc_color;
     this.border_color = border_color;
-    this.logo = 'https://raw.githubusercontent.com/Jadest13/github-union-badge/master/api/theme/logo/' + logo;
+    this.logo = 'https://raw.githubusercontent.com/Jadest13/github-union-badge/master/themes/logo/' + logo;
 
     this.unionInfo = unionInfo;
     this.nameInfo = nameInfo;
