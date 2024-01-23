@@ -40,18 +40,13 @@ class SVGText {
 class Card {
   width         : number;
   height        : number;
-  title         : string;
-  desc          : string;
   logo          : string;
+
   pri_bg        : string;
   sec_bg        : string;
-
   title_color   : string;
-  
   desc_color    : string;
-
   border_color  : string;
-  info_url      : string;
 
   unionInfo: textInfo;
   nameInfo: textInfo;
@@ -62,6 +57,8 @@ class Card {
   nameText: SVGText;
   descText: SVGText;
   urlText: SVGText;
+
+  qrcode: string;
 
   constructor({
     width = 720,
@@ -76,6 +73,7 @@ class Card {
     nameInfo = {text: '', color: '#000000'},
     descInfo = {text: '', color: '#000000'},
     urlInfo = {text: '', color: '#000000'},
+    qrcode = '',
   }) {
     this.width = width;
     this.height = height;
@@ -90,6 +88,7 @@ class Card {
     this.nameInfo = nameInfo;
     this.descInfo = descInfo;
     this.urlInfo = urlInfo;
+    this.qrcode = qrcode;
 
     this.unionText = new SVGText({
       text: this.unionInfo.text,
@@ -132,7 +131,6 @@ class Card {
           }
         ]]>
       </style>
-
       <defs>
         <linearGradient id="grad" x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" style="stop-color:${this.pri_bg};stop-opacity:1"></stop>
@@ -163,16 +161,15 @@ class Card {
         <rect x="4px" y="4" width="${this.width-8}" height="${this.height-8}" rx="30" ry="30" class="background"/>
         
         
-        <image href="${this.logo}" x="50%" y="380" height="320" width="320" transform="translate(-160,-160)" class="tier-title"/>
+        <image xlink:href="${this.logo}" x="50%" y="380" height="320" width="320" transform="translate(-160,-160)" class="tier-title"/>
         
 
-        <image href="http://qrcode.kaywa.com/img.php?d=https://www.happyjung.com?c1=3D1%26c2=2%26c3=3" x="50%" y="847.5" height="175" width="175" transform="translate(-87.5,-87.5)" class="tier-title"/>
+        <image xlink:href="${this.qrcode}" x="50%" y="847.5" height="175" width="175" transform="translate(-87.5,-87.5)" class="tier-title"/>
         
         ${this.unionText.getElement()}
         ${this.nameText.getElement()}
         ${this.descText.getElement()}
         ${this.urlText.getElement()}
-        
       </svg>
     `
   }
@@ -189,7 +186,7 @@ const renderStatsCard = (options) => {
   return card.render(
     `
       <svg x="0" y="0">
-        asd
+        <image href="http://qrcode.kaywa.com/img.php?d=https://www.happyjung.com?c1=3D1%26c2=2%26c3=3" x="50%" y="847.5" height="175" width="175" transform="translate(-87.5,-87.5)" class="tier-title"/>
       </svg>
     `
   );

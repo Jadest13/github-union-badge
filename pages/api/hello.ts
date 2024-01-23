@@ -1,6 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { renderStatsCard } from "../../components/stat-card"; 
 import { themes } from "../../themes/index"; 
+import { resolve } from 'path';
+import { useEffect, useState } from 'react';
 
 type ResponseData = {
   message: string
@@ -40,11 +42,22 @@ const clampValue = (number, min, max) => {
   return Math.max(min, Math.min(number, max));
 };
 
+export const useSleep = delay => new Promise(resolve => setTimeout(resolve, delay));
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseData|String>
 ) {
-  
+  const imageUrl = "https://i.imgur.com/fHyEMsl.jpg";
+
+  const fetchImage = async () => {
+    // const res = await fetch('https://raw.githubusercontent.com/Jadest13/github-union-badge/master/themes/logo/KOREA.png');
+    const res = await fetch(imageUrl);
+    const imageBlob = await res.blob();
+    const imageObjectURL = await URL.createObjectURL(imageBlob);
+    console.log(imageObjectURL);
+  };
+
   const {
     unionname,
     username,
@@ -53,12 +66,13 @@ export default async function handler(
     cache_seconds,
   } = req.query;
 
-  res.setHeader("Content-Type", "image/svg+xml");
-
   const nowTheme = themes[unionname.toString()];
+
+  
 
   try {
     console.log(req.query);
+
     const cardInfo = await {
       unionInfo: {
         text: nowTheme.title,
@@ -80,8 +94,11 @@ export default async function handler(
       logo: nowTheme.logo,
       pri_bg: nowTheme.primary_bg,
       sec_bg: nowTheme.secondary_bg,
+      qrcode: await fetchImage(),
       size: 1,
     };
+
+    const result = await renderStatsCard(cardInfo)
 
     let cacheSeconds = clampValue(
       // parseInt(cache_seconds || CONSTANTS.CARD_CACHE_SECONDS),
@@ -92,17 +109,17 @@ export default async function handler(
     cacheSeconds = process.env.CACHE_SECONDS
       ? parseInt(process.env.CACHE_SECONDS, 10) || cacheSeconds
       : cacheSeconds;
-
-    res.setHeader(
+    
+    await res.setHeader("Content-Type", "image/svg+xml");
+    await res.setHeader(
       "Cache-Control",
       `max-age=${
         cacheSeconds / 2
       }, s-maxage=${cacheSeconds}, stale-while-revalidate=${CONSTANTS.ONE_DAY}`,
     );
 
-    return res.send(
-      await renderStatsCard(cardInfo)
-    )
+    return res.status(200).send(result)
+
   } catch (err) {
     console.log(err)
     return res.status(200).json({ message: 'Hello from Next.js!' })
