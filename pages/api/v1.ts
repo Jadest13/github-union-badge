@@ -147,6 +147,8 @@ function qrToPath(data, size, margin) {
 }
 
 const QRCodeSVG = (url) => {
+  if (!url) return null;
+
   const qrcode = QRCode.create(url, {
     errorCorrectionLevel: "H",
     maskPattern: 7,
@@ -180,11 +182,11 @@ export default async function handler(
 
     const result = tmp({
       logoSVG: logoSVG,
-      qrcodeSVG: qrcodeSVG,
+      qrcodeSVG: qrcodeSVG ?? "",
       ...nowTheme,
-      username,
-      desc,
-      url,
+      username: username ?? "",
+      desc: desc ?? "",
+      url: url ?? "",
     });
 
     await res.setHeader("Content-Type", "image/svg+xml");

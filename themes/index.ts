@@ -19,7 +19,7 @@ export const themes = {
   },
   hanyang: {
     title: "HANYANG",
-    logo: "HANYANG.png",
+    logo: "hanyang.svg",
     primary_bg: "#006BCD",
     secondary_bg: "#FFFFFF",
     title_color: "#FFFFFF",

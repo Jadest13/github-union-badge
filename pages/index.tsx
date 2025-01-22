@@ -1,41 +1,105 @@
-import QRCode from "qrcode.react";
-
-import useSWR from "swr";
-// import PersonComponent from "../components/Person";
-import type { Person } from "../interfaces";
 import { useEffect, useState } from "react";
+import { themes } from "../themes";
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+const Index = () => {
+  const [origin, setOrigin] = useState<string>(".");
+  const [unionname, setUnionname] = useState<string>(Object.keys(themes)[0]);
+  const [username, setUsername] = useState<string>("");
+  const [desc, setDesc] = useState<string>("");
+  const [url, setURL] = useState<string>("");
 
-export default function Index() {
-  const { data, error, isLoading } = useSWR<Person[]>("/api/people", fetcher);
-  const [img, setImg] = useState<string>();
-
-  const imageUrl = "https://i.imgur.com/fHyEMsl.jpg";
-
-  const fetchImage = async () => {
-    const res = await fetch(imageUrl);
-    const imageBlob = await res.blob();
-    const imageObjectURL = URL.createObjectURL(imageBlob);
-    console.log(imageObjectURL);
-    setImg(imageObjectURL);
+  const handleChangeUnionname = (e) => {
+    setUnionname(e.target.value);
+  };
+  const handleChangeUsername = (e) => {
+    setUsername(e.target.value);
+  };
+  const handleChangeDesc = (e) => {
+    setDesc(e.target.value);
+  };
+  const handleChangeURL = (e) => {
+    setURL(e.target.value);
+  };
+  const handleCopyClipBoard = async () => {
+    try {
+      await navigator.clipboard.writeText(imageUrl);
+      alert("클립보드에 링크가 복사되었습니다.");
+    } catch (e) {
+      alert("복사에 실패하였습니다");
+    }
   };
 
   useEffect(() => {
-    fetchImage();
+    setOrigin(window.location.origin);
   }, []);
 
-  if (error) return <div>Failed to load</div>;
-  if (isLoading) return <div>Loading...</div>;
-  if (!data) return null;
+  const imageUrl = `${origin}/api/v1${
+    unionname.length ? `?unionname=${unionname}` : ""
+  }${username.length ? `&username=${username}` : ""}${
+    desc.length ? `&desc=${desc}` : ""
+  }${url.length ? `&url=${url}` : ""}`;
 
   return (
-    // <QRCode value= {'https://github.com/Jadest13/Jadest13'} />
-    // <ul>
-    //   {data.map((p) => (
-    //     <PersonComponent key={p.id} person={p} />
-    //   ))}
-    // </ul>
-    <img height={200} src={img}></img>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+    >
+      <img
+        src={imageUrl}
+        style={{ height: "640px", padding: "32px 100%", background: "gray" }}
+      />
+
+      <div
+        style={{
+          padding: "12px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <div>{imageUrl}</div>
+        <button onClick={handleCopyClipBoard}>Copy</button>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "end",
+          gap: "8px",
+        }}
+      >
+        <label style={{ display: "flex", gap: "4px" }}>
+          <div>Union:</div>
+          <select
+            value={unionname}
+            name="union"
+            id="lang"
+            style={{ width: "178px" }}
+            onChange={handleChangeUnionname}
+          >
+            {Object.entries(themes).map(([key, value]) => (
+              <option value={key}>{value.title}</option>
+            ))}
+          </select>
+        </label>
+        <label style={{ display: "flex", gap: "4px" }}>
+          <div>Username:</div>
+          <input type="text" value={username} onChange={handleChangeUsername} />
+        </label>
+        <label style={{ display: "flex", gap: "4px" }}>
+          <div>description:</div>
+          <input type="text" value={desc} onChange={handleChangeDesc} />
+        </label>
+        <label style={{ display: "flex", gap: "4px" }}>
+          <div>URL:</div>
+          <input type="text" value={url} onChange={handleChangeURL} />
+        </label>
+      </div>
+    </div>
   );
-}
+};
+
+export default Index;
