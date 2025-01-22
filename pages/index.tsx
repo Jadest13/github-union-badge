@@ -28,6 +28,18 @@ const Index = () => {
       alert("복사에 실패하였습니다");
     }
   };
+  const handleCopyMarkdownClipBoard = async () => {
+    const markdownURL = `![${
+      unionname.charAt(0).toUpperCase() + unionname.slice(1)
+    } Badge](${imageUrl})`;
+
+    try {
+      await navigator.clipboard.writeText(markdownURL);
+      alert("클립보드에 링크가 복사되었습니다.");
+    } catch (e) {
+      alert("복사에 실패하였습니다");
+    }
+  };
 
   useEffect(() => {
     setOrigin(window.location.origin);
@@ -37,7 +49,7 @@ const Index = () => {
     unionname.length ? `?unionname=${unionname}` : ""
   }${username.length ? `&username=${username}` : ""}${
     desc.length ? `&desc=${desc}` : ""
-  }${url.length ? `&url=${url}` : ""}`;
+  }${url.length ? `&url=${url}` : ""}`.replace(/\ /g, "%20");
 
   return (
     <div
@@ -61,7 +73,10 @@ const Index = () => {
         }}
       >
         <div>{imageUrl}</div>
-        <button onClick={handleCopyClipBoard}>Copy</button>
+        <div style={{ display: "flex", gap: "4px" }}>
+          <button onClick={handleCopyClipBoard}>Copy URL</button>
+          <button onClick={handleCopyMarkdownClipBoard}>Copy Markdown</button>
+        </div>
       </div>
       <div
         style={{
@@ -81,7 +96,9 @@ const Index = () => {
             onChange={handleChangeUnionname}
           >
             {Object.entries(themes).map(([key, value]) => (
-              <option value={key}>{value.title}</option>
+              <option key={key} value={key}>
+                {value.title}
+              </option>
             ))}
           </select>
         </label>
