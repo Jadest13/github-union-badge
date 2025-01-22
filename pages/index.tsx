@@ -1,9 +1,9 @@
-import QRCode from 'qrcode.react';
+import QRCode from "qrcode.react";
 
 import useSWR from "swr";
 // import PersonComponent from "../components/Person";
 import type { Person } from "../interfaces";
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -28,7 +28,6 @@ export default function Index() {
   if (error) return <div>Failed to load</div>;
   if (isLoading) return <div>Loading...</div>;
   if (!data) return null;
-
 
   return (
     // <QRCode value= {'https://github.com/Jadest13/Jadest13'} />
